@@ -32,7 +32,7 @@ intializeDBAndServer();
 //middleware
 const authenticationToken = (req, res, next) => {
   let jwtTok;
-  const authHeader = req.header["authorization"];
+  const authHeader = req.headers["authorization"];
   if (authHeader !== undefined) {
     jwtTok = authHeader.split(" ")[1];
   }
@@ -49,6 +49,19 @@ const authenticationToken = (req, res, next) => {
       }
     });
   }
+};
+
+const toCamelCase = (obj) => {
+  const newObj = {};
+  for (const key in obj) {
+    const camelCaseKey = key.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
+    newObj[camelCaseKey] = obj[key];
+  }
+  return newObj;
+};
+
+const convertArrayToCamelCase = (array) => {
+  return array.map((item) => toCamelCase(item));
 };
 
 //api 1
@@ -71,8 +84,7 @@ app.post("/login/", async (req, res) => {
     } else {
       const payload = { username: username };
       const jwtToken = jwt.sign(payload, "secretekey");
-      console.log(jwtToken);
-      res.send(jwtToken);
+      res.send({ jwtToken });
     }
   }
 });
@@ -83,7 +95,7 @@ app.get("/states", authenticationToken, async (req, res) => {
     SELECT * FROM state;`;
 
   const stateList = await db.all(stateListQuery);
-  res.send(stateList);
+  res.send(convertArrayToCamelCase(stateList));
 });
 
 //api 3
@@ -93,7 +105,7 @@ app.get("/states/:stateId/", authenticationToken, async (req, res) => {
     SELECT * FROM state where state_id=${stateId};`;
 
   const stateList = await db.get(stateQuery);
-  res.send(stateList);
+  res.send(toCamelCase(stateList));
 });
 
 //api 4
@@ -114,7 +126,7 @@ app.get("/districts/:districtId/", authenticationToken, async (req, res) => {
     SELECT * FROM district where district_id=${districtId};`;
 
   const districtList = await db.get(districtQuery);
-  res.send(districtList);
+  res.send(toCamelCase(districtList));
 });
 
 //api 6
