@@ -30,7 +30,7 @@ const intializeDBAndServer = async () => {
 intializeDBAndServer();
 
 //middleware
-const authenticationToken = (req, res, next) => {
+const authenticateToken = (req, res, next) => {
   let jwtTok;
   const authHeader = req.headers["authorization"];
   if (authHeader !== undefined) {
@@ -90,7 +90,7 @@ app.post("/login/", async (req, res) => {
 });
 
 //api 2
-app.get("/states", authenticationToken, async (req, res) => {
+app.get("/states", authenticateToken, async (req, res) => {
   const stateListQuery = `
     SELECT * FROM state;`;
 
@@ -99,7 +99,7 @@ app.get("/states", authenticationToken, async (req, res) => {
 });
 
 //api 3
-app.get("/states/:stateId/", authenticationToken, async (req, res) => {
+app.get("/states/:stateId/", authenticateToken, async (req, res) => {
   const { stateId } = req.params;
   const stateQuery = `
     SELECT * FROM state where state_id=${stateId};`;
@@ -109,7 +109,7 @@ app.get("/states/:stateId/", authenticationToken, async (req, res) => {
 });
 
 //api 4
-app.post("/districts", authenticationToken, async (req, res) => {
+app.post("/districts", authenticateToken, async (req, res) => {
   const { districtName, stateId, cases, cured, active, deaths } = req.body;
   const putQuery = `
     INSERT INTO district(district_name,state_id,cases,cured,active,deaths)
@@ -120,7 +120,7 @@ app.post("/districts", authenticationToken, async (req, res) => {
 });
 
 //api 5
-app.get("/districts/:districtId/", authenticationToken, async (req, res) => {
+app.get("/districts/:districtId/", authenticateToken, async (req, res) => {
   const { districtId } = req.params;
   const districtQuery = `
     SELECT * FROM district where district_id=${districtId};`;
@@ -130,7 +130,7 @@ app.get("/districts/:districtId/", authenticationToken, async (req, res) => {
 });
 
 //api 6
-app.delete("/districts/:districtId/", authenticationToken, async (req, res) => {
+app.delete("/districts/:districtId/", authenticateToken, async (req, res) => {
   const { districtId } = req.params;
   const districtQuery = `
     DELETE FROM district where district_id=${districtId};`;
@@ -140,7 +140,7 @@ app.delete("/districts/:districtId/", authenticationToken, async (req, res) => {
 });
 
 //api 7
-app.put("/districts/:districtId/", authenticationToken, async (req, res) => {
+app.put("/districts/:districtId/", authenticateToken, async (req, res) => {
   const { districtId } = req.params;
   const { districtName, stateId, cases, cured, active, deaths } = req.body;
   const updateQuery = `
@@ -159,7 +159,7 @@ app.put("/districts/:districtId/", authenticationToken, async (req, res) => {
 });
 
 //api 8
-app.get("/states/:stateId/stats/", authenticationToken, async (req, res) => {
+app.get("/states/:stateId/stats/", authenticateToken, async (req, res) => {
   const { stateId } = req.params;
   const statsQuery = `
     SELECT 
